@@ -4,6 +4,7 @@ class SNAKE:
     def __init__(self):
         self.body = [Vector2(7, 10), Vector2(6, 10), Vector2(5, 10)]
         self.direction = (1,0)
+        self.direction_locked = False  # To prevent multiple direction changes in one frame
         self.score = 0
     def draw_snake(self):
         for block in self.body:
@@ -16,6 +17,12 @@ class SNAKE:
         body_copy = self.body[:-1]
         body_copy.insert(0,body_copy[0] + self.direction)
         self.body = body_copy[:]
+        self.direction_locked = False  # Unlock direction changes after movement
+    
+    def change_direction(self, new_direction):
+        if not self.direction_locked and new_direction + self.direction != Vector2(0, 0):
+            self.direction = new_direction
+            self.direction_locked = True  # Lock direction changes until next move
 
 class SNAKEOpp:
     def __init__(self):
@@ -158,13 +165,13 @@ def solo():
         # Add input delay based off of screen update time or tickrate?
             if event.type == pygame.KEYDOWN:
                 if event.key ==  pygame.K_UP and snake.direction != Vector2(0, 1):
-                    snake.direction = Vector2(0, -1)
+                    snake.change_direction(Vector2(0, -1))
                 elif event.key == pygame.K_DOWN and snake.direction != Vector2(0, -1):
-                    snake.direction = Vector2(0, 1)
+                    snake.change_direction(Vector2(0, 1))
                 elif event.key == pygame.K_LEFT and snake.direction != Vector2(1, 0):
-                    snake.direction = Vector2(-1, 0)
+                    snake.change_direction(Vector2(-1, 0))
                 elif event.key == pygame.K_RIGHT and snake.direction != Vector2(-1, 0):
-                    snake.direction = Vector2(1, 0)  
+                    snake.change_direction(Vector2(1, 0))  
 
         screen.fill((175, 215, 70))
         fruit.draw_fruit()
