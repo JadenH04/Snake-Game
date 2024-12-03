@@ -35,7 +35,7 @@ class SNAKEOpp:
             x_pos = int(block.x * cell_size)
             y_pos = int(block.y * cell_size)
             block_rect = pygame.Rect(x_pos, y_pos, cell_size, cell_size)
-            pygame.draw.rect(screen, (183, 111, 122), block_rect)
+            pygame.draw.rect(screen, (70, 130, 180), block_rect)
     
     def move_snake(self):
         
@@ -103,17 +103,13 @@ def arrow_win():
     my_font = pygame.font.SysFont('times new roman', 30)
     game_over_surface = my_font.render('Arrow Keys win!', True, (255,100,25))
     restart_text_surface = my_font.render('Press Y to restart, Press N to return to menu', True, (255,100,0))
-    score_text_surface = my_font.render(f"Score: {str(snake.score)}", True, (0,0,255))
     game_over_rect = game_over_surface.get_rect()
     restart_text_rect = restart_text_surface.get_rect()
-    score_text_rect = score_text_surface.get_rect()
     game_over_rect.midtop = (400, 400)
-    score_text_rect.midtop = (400, 100)
     restart_text_rect.midtop = (400, 700)
     screen.fill((0,0,0))
     screen.blit(game_over_surface, game_over_rect)
     screen.blit(restart_text_surface, restart_text_rect)
-    screen.blit(score_text_surface, score_text_rect)
     pygame.display.update()
     while True:
         for event in pygame.event.get():
@@ -237,13 +233,13 @@ def OneOnOne():
                 snake.move_snake()
                 snakeopp.move_snake()
                 # Winner
-                if (snake.body[0][0] > 19 or snake.body[0][0] < 0 or snake.body[0][1] > 19 or snake.body[0][1] < 0 or (snake.body[0] in snake.body[1:]) or (snake.body[0] == snakeopp.body[1:])):                
+                if (snake.body[0][0] > 19 or snake.body[0][0] < 0 or snake.body[0][1] > 19 or snake.body[0][1] < 0 or (snake.body[0] in snake.body[1:]) or (snake.body[0] in snakeopp.body[1:])):                
                     if wasd_win():
-                        snake = SNAKE()
+                        snake = SNAKE1()
                         snakeopp = SNAKEOpp()        
-                elif (snakeopp.body[0][0] > 19 or snakeopp.body[0][0] < 0 or snakeopp.body[0][1] > 19 or snakeopp.body[0][1] < 0 or (snakeopp.body[0] in snakeopp.body[1:]) or (snakeopp.body[0] == snake.body[1:])):                
+                elif (snakeopp.body[0][0] > 19 or snakeopp.body[0][0] < 0 or snakeopp.body[0][1] > 19 or snakeopp.body[0][1] < 0 or (snakeopp.body[0] in snakeopp.body[1:]) or (snakeopp.body[0] in snake.body[1:])):                
                     if arrow_win():
-                        snake = SNAKE()
+                        snake = SNAKE1()
                         snakeopp = SNAKEOpp()
         # Add input delay based off of screen update time or tickrate?
             if event.type == pygame.KEYDOWN:
