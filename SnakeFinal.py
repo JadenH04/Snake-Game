@@ -28,6 +28,7 @@ class SNAKEOpp:
     def __init__(self):
         self.body = [Vector2(7, 1), Vector2(6, 1), Vector2(5, 1)]
         self.direction = (1,0)
+        self.direction_locked = False
         self.score = 0
     def draw_snake(self):
         for block in self.body:
@@ -37,16 +38,52 @@ class SNAKEOpp:
             pygame.draw.rect(screen, (183, 111, 122), block_rect)
     
     def move_snake(self):
-        body_copy = self.body[:-1]
-        body_copy.insert(0,body_copy[0] + self.direction)
-        self.body = body_copy[:]
+        
+        ##body_copy = self.body[:-1]
+        #body_copy.insert(0,body_copy[0] + self.direction)
+        ##self.body = body_copy[:]
+        ##self.direction_locked = False  # Unlock direction changes after movement
+        self.body.insert(0, self.body[0] + self.direction)
+        self.direction_locked = False
+
+    def change_direction(self, new_direction):
+        if not self.direction_locked and new_direction + self.direction != Vector2(0, 0):
+            self.direction = new_direction
+            self.direction_locked = True  # Lock direction changes until next move
+    
+class SNAKE1:
+    def __init__(self):
+        self.body = [Vector2(7, 18), Vector2(6, 18), Vector2(5, 18)]
+        self.direction = (1,0)
+        self.direction_locked = False
+        self.score = 0
+    def draw_snake(self):
+        for block in self.body:
+            x_pos = int(block.x * cell_size)
+            y_pos = int(block.y * cell_size)
+            block_rect = pygame.Rect(x_pos, y_pos, cell_size, cell_size)
+            pygame.draw.rect(screen, (183, 111, 122), block_rect)
+    
+    def move_snake(self):
+        
+        ##body_copy = self.body[:-1]
+        #body_copy.insert(0,body_copy[0] + self.direction)
+        ##self.body = body_copy[:]
+        ##self.direction_locked = False  # Unlock direction changes after movement
+        self.body.insert(0, self.body[0] + self.direction)
+        self.direction_locked = False
+
+    def change_direction(self, new_direction):
+        if not self.direction_locked and new_direction + self.direction != Vector2(0, 0):
+            self.direction = new_direction
+            self.direction_locked = True  # Lock direction changes until next move
 
 class FRUIT:
     def __init__(self):
-        self.x = random.randint(0, cell_number - 1)
+        self.x = random.randint(0, cell_number - 1)        
         self.y = random.randint(0, cell_number - 1)
         self.pos = pygame.math.Vector2(self.x,self.y)
-
+  
     def draw_fruit(self):
         fruit_rect = pygame.Rect(int(self.pos.x * cell_size), int(self.pos.y*cell_size), cell_size, cell_size)
         pygame.draw.rect(screen, (126, 166, 114), fruit_rect)
@@ -80,6 +117,9 @@ def arrow_win():
     pygame.display.update()
     while True:
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # Check for the window close event
+                pygame.quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
                     snake.__init__
@@ -102,6 +142,9 @@ def wasd_win():
     pygame.display.update()
     while True:
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # Check for the window close event
+                pygame.quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
                     snake.__init__
@@ -124,6 +167,9 @@ def game_over():
     pygame.display.update()
     while True:
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # Check for the window close event
+                pygame.quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
                     snake.__init__
@@ -181,7 +227,7 @@ def solo():
 
 def OneOnOne():
     snakeopp = SNAKEOpp()
-    snake = SNAKE()
+    snake = SNAKE1()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -191,33 +237,33 @@ def OneOnOne():
                 snake.move_snake()
                 snakeopp.move_snake()
                 # Winner
-                if (snake.body[0][0] > 19 or snake.body[0][0] < 0 or snake.body[0][1] > 19 or snake.body[0][1] < 0 or (snake.body[0] in snake.body[1:]) or (snake.body[0][0] == snakeopp.body[1:])):                
+                if (snake.body[0][0] > 19 or snake.body[0][0] < 0 or snake.body[0][1] > 19 or snake.body[0][1] < 0 or (snake.body[0] in snake.body[1:]) or (snake.body[0] == snakeopp.body[1:])):                
                     if wasd_win():
                         snake = SNAKE()
                         snakeopp = SNAKEOpp()        
-                elif (snakeopp.body[0][0] > 19 or snakeopp.body[0][0] < 0 or snakeopp.body[0][1] > 19 or snakeopp.body[0][1] < 0 or (snakeopp.body[0] in snakeopp.body[1:]) or (snakeopp.body[0][0] == snake.body[1:])):                
+                elif (snakeopp.body[0][0] > 19 or snakeopp.body[0][0] < 0 or snakeopp.body[0][1] > 19 or snakeopp.body[0][1] < 0 or (snakeopp.body[0] in snakeopp.body[1:]) or (snakeopp.body[0] == snake.body[1:])):                
                     if arrow_win():
                         snake = SNAKE()
                         snakeopp = SNAKEOpp()
         # Add input delay based off of screen update time or tickrate?
             if event.type == pygame.KEYDOWN:
                 if event.key ==  pygame.K_UP and snake.direction != Vector2(0, 1):
-                    snake.direction = Vector2(0, -1)
+                   snake.change_direction(Vector2(0, -1))
                 elif event.key == pygame.K_DOWN and snake.direction != Vector2(0, -1):
-                    snake.direction = Vector2(0, 1)
+                    snake.change_direction(Vector2(0, 1))
                 elif event.key == pygame.K_LEFT and snake.direction != Vector2(1, 0):
-                    snake.direction = Vector2(-1, 0)
+                     snake.change_direction(Vector2(-1, 0))
                 elif event.key == pygame.K_RIGHT and snake.direction != Vector2(-1, 0):
-                    snake.direction = Vector2(1, 0)             
+                    snake.change_direction(Vector2(1, 0))             
             if event.type == pygame.KEYDOWN:
                 if event.key ==  pygame.K_w and snakeopp.direction != Vector2(0, 1):
-                    snakeopp.direction = Vector2(0, -1)
+                    snakeopp.change_direction(Vector2(0, -1))
                 elif event.key == pygame.K_s and snakeopp.direction != Vector2(0, -1):
-                    snakeopp.direction = Vector2(0, 1)
+                    snakeopp.change_direction(Vector2(0, 1))
                 elif event.key == pygame.K_a and snakeopp.direction != Vector2(1, 0):
-                    snakeopp.direction = Vector2(-1, 0)
+                    snakeopp.change_direction(Vector2(-1, 0))
                 elif event.key == pygame.K_d and snakeopp.direction != Vector2(-1, 0):
-                    snakeopp.direction = Vector2(1, 0)  
+                    snakeopp.change_direction(Vector2(1, 0))  
         screen.fill((175, 215, 70))
         snakeopp.draw_snake()
         snake.draw_snake()
