@@ -120,7 +120,7 @@ snakeopp = SNAKEOpp()
 
 def arrow_win():
     my_font = pygame.font.SysFont('times new roman', 30)
-    game_over_surface = my_font.render('Arrow Keys win!', True, (255,100,25))
+    game_over_surface = my_font.render('Red win!', True, (255,100,25))
     restart_text_surface = my_font.render('Press Y to restart, Press N to return to menu', True, (255,100,0))
     game_over_rect = game_over_surface.get_rect()
     restart_text_rect = restart_text_surface.get_rect()
@@ -145,7 +145,7 @@ def arrow_win():
 
 def wasd_win():
     my_font = pygame.font.SysFont('times new roman', 30)
-    game_over_surface = my_font.render('WASD Keys win!', True, (255,100,25))
+    game_over_surface = my_font.render('Blue win!', True, (255,100,25))
     restart_text_surface = my_font.render('Press Y to restart, Press N to return to menu', True, (255,100,0))
     game_over_rect = game_over_surface.get_rect()
     restart_text_rect = restart_text_surface.get_rect()
@@ -168,31 +168,6 @@ def wasd_win():
                 if event.key == pygame.K_n:
                     main_menu()
 
-def game_over():
-    my_font = pygame.font.SysFont('times new roman', 30)
-    game_over_surface = my_font.render('YOU DIED', True, (255,100,25))
-    restart_text_surface = my_font.render('Press Y to restart, Press N to return to menu', True, (255,100,0))
-    game_over_rect = game_over_surface.get_rect()
-    restart_text_rect = restart_text_surface.get_rect()
-    game_over_rect.midtop = (400, 400)
-    restart_text_rect.midtop = (400, 700)
-    screen.fill((0,0,0))
-    screen.blit(game_over_surface, game_over_rect)
-    screen.blit(restart_text_surface, restart_text_rect)
-    pygame.display.update()
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:  # Check for the window close event
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_y:
-                    snake.__init__
-                    fruit.__init__
-                    return True
-                if event.key == pygame.K_n:
-                    main_menu()
-
 pygame.init()
 cell_size = 40
 cell_number = 20
@@ -200,8 +175,7 @@ screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_si
 clock = pygame.time.Clock()
 
 SCREEN_UPDATE = pygame.USEREVENT
-pygame.time.set_timer(SCREEN_UPDATE, 125) #125 milliseconds
-
+pygame.time.set_timer(SCREEN_UPDATE, 150) #125 milliseconds for a screen update
 
 def solo():
     fruit = FRUIT()
@@ -220,10 +194,10 @@ def solo():
                     snake.score += 5
                 # Game over :(
                 if (snake.body[0][0] > 19 or snake.body[0][0] < 0 or snake.body[0][1] > 19 or snake.body[0][1] < 0 or (snake.body[0] in snake.body[1:])):                
-                    if game_over():
-                        snake = SNAKE()
-                        fruit = FRUIT()          
-        # Add input delay based off of screen update time or tickrate?
+                    game_over(snake)   
+                    snake = SNAKE()
+                    fruit = FRUIT()    
+        # WITH input delay
             if event.type == pygame.KEYDOWN:
                 if event.key ==  pygame.K_UP and snake.direction != Vector2(0, 1):
                     snake.change_direction(Vector2(0, -1))
@@ -238,7 +212,36 @@ def solo():
         fruit.draw_fruit()
         snake.draw_snake()
         pygame.display.update()
-        clock.tick(30) 
+        clock.tick(60) 
+
+def game_over(snake):
+    my_font = pygame.font.SysFont('times new roman', 30)
+    game_over_surface = my_font.render('YOU DIED', True, (255,0,0))
+    restart_text_surface = my_font.render('Press Y to restart, Press N for menu', True, (255,100,0))
+    score_text_surface = my_font.render(f"Score: {str(snake.score)}", True, (0,0,255))
+    game_over_rect = game_over_surface.get_rect()
+    restart_text_rect = restart_text_surface.get_rect()
+    score_text_rect = score_text_surface.get_rect()
+    game_over_rect.midtop = (400, 400)
+    score_text_rect.midtop = (400, 100)
+    restart_text_rect.midtop = (400, 700)
+    screen.fill((0,0,0))
+    screen.blit(game_over_surface, game_over_rect)
+    screen.blit(restart_text_surface, restart_text_rect)
+    screen.blit(score_text_surface, score_text_rect)
+    pygame.display.update()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # Check for the window close event
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_y:
+                    snake.__init__
+                    fruit.__init__
+                    return True
+                if event.key == pygame.K_n:
+                    main_menu()
 
 def OneOnOne():
     snakeopp = SNAKEOpp()
@@ -283,10 +286,10 @@ def OneOnOne():
         snakeopp.draw_snake()
         snake.draw_snake()
         pygame.display.update()
-        clock.tick(30)  
+        clock.tick(60)  
 def decayMode():
     snakeopp = SNAKEImpact((7, 1), (6, 1), (5, 1), color = (70, 130, 180))
-    snake = SNAKEImpact((7, 18), (6, 18), (5, 18))
+    snake1 = SNAKEImpact((7, 18), (6, 18), (5, 18))
     
     while True:
         for event in pygame.event.get():
@@ -296,13 +299,13 @@ def decayMode():
             
             if event.type == SCREEN_UPDATE:
                 # Handle blocked status but don't change direction automatically
-                for current_snake in [snake, snakeopp]:
-                    if len(current_snake.body) > 0:  # Prevent moving empty snakes.
-                        next_pos = current_snake.body[0] + current_snake.direction
+                for current_snake1 in [snake1, snakeopp]:
+                    if len(current_snake1.body) > 0:  # Prevent moving empty snakes.
+                        next_pos = current_snake1.body[0] + current_snake1.direction
                         
                         # Check if the snake is blocked
                         if (
-                            next_pos in snake.body or
+                            next_pos in snake1.body or
                             next_pos in snakeopp.body or
                             next_pos.x < 0 or
                             next_pos.x >= cell_number or
@@ -310,53 +313,53 @@ def decayMode():
                             next_pos.y >= cell_number
                         ):
                             # The snake is blocked, so it should not move
-                            current_snake.blocked = True
-                            current_snake.body.pop()
+                            current_snake1.blocked = True
+                            current_snake1.body.pop()
                         else:
                             # The snake is not blocked, so it can move
-                            current_snake.blocked = False
+                            current_snake1.blocked = False
                         
                         # Only move if the snake isn't blocked
-                        if not current_snake.blocked:
-                            current_snake.move_snake()
+                        if not current_snake1.blocked:
+                            current_snake1.move_snake()
 
             # Handle game over (no respawning)
-            if len(snake.body) == 0:
+            if len(snake1.body) == 0:
                 if wasd_win():
-                    snake = SNAKE1()
+                    snake1 = SNAKE1()
                     snakeopp = SNAKEOpp()
             if len(snakeopp.body) == 0:
                 if arrow_win():
-                    snake = SNAKE1()
+                    snake1 = SNAKE1()
                     snakeopp = SNAKEOpp()
                 
                 
             if event.type == pygame.KEYDOWN:
                 # Snake 1 Controls
-                if event.key == pygame.K_UP and snake.direction != Vector2(0, 1):
+                if event.key == pygame.K_UP and snake1.direction != Vector2(0, 1):
                     # Check if the forward-facing position is clear before changing direction
-                    next_pos = snake.body[0] + Vector2(0, -1)
-                    if next_pos not in snake.body and next_pos not in snakeopp.body and next_pos.y >= 0:
-                        snake.direction = Vector2(0, -1)
-                        snake.blocked = False
+                    next_pos = snake1.body[0] + Vector2(0, -1)
+                    if next_pos not in snake1.body and next_pos not in snakeopp.body and next_pos.y >= 0:
+                        snake1.direction = Vector2(0, -1)
+                        snake1.blocked = False
                 elif event.key == pygame.K_DOWN and snake.direction != Vector2(0, -1):
                     # Check if the forward-facing position is clear before changing direction
-                    next_pos = snake.body[0] + Vector2(0, 1)
-                    if next_pos not in snake.body and next_pos not in snakeopp.body and next_pos.y < cell_number:
-                        snake.direction = Vector2(0, 1)
-                        snake.blocked = False
-                elif event.key == pygame.K_LEFT and snake.direction != Vector2(1, 0):
+                    next_pos = snake1.body[0] + Vector2(0, 1)
+                    if next_pos not in snake1.body and next_pos not in snakeopp.body and next_pos.y < cell_number:
+                        snake1.direction = Vector2(0, 1)
+                        snake1.blocked = False
+                elif event.key == pygame.K_LEFT and snake1.direction != Vector2(1, 0):
                     # Check if the forward-facing position is clear before changing direction
-                    next_pos = snake.body[0] + Vector2(-1, 0)
-                    if next_pos not in snake.body and next_pos not in snakeopp.body and next_pos.x >= 0:
-                        snake.direction = Vector2(-1, 0)
-                        snake.blocked = False
-                elif event.key == pygame.K_RIGHT and snake.direction != Vector2(-1, 0):
+                    next_pos = snake1.body[0] + Vector2(-1, 0)
+                    if next_pos not in snake1.body and next_pos not in snakeopp.body and next_pos.x >= 0:
+                        snake1.direction = Vector2(-1, 0)
+                        snake1.blocked = False
+                elif event.key == pygame.K_RIGHT and snake1.direction != Vector2(-1, 0):
                     # Check if the forward-facing position is clear before changing direction
-                    next_pos = snake.body[0] + Vector2(1, 0)
-                    if next_pos not in snake.body and next_pos not in snakeopp.body and next_pos.x < cell_number:
-                        snake.direction = Vector2(1, 0)
-                        snake.blocked = False
+                    next_pos = snake1.body[0] + Vector2(1, 0)
+                    if next_pos not in snake1.body and next_pos not in snakeopp.body and next_pos.x < cell_number:
+                        snake1.direction = Vector2(1, 0)
+                        snake1.blocked = False
 
                 # Snake 2 Controls
                 if event.key == pygame.K_w and snakeopp.direction != Vector2(0, 1):
@@ -368,25 +371,25 @@ def decayMode():
                 elif event.key == pygame.K_s and snakeopp.direction != Vector2(0, -1):
                     # Check if the forward-facing position is clear before changing direction
                     next_pos = snakeopp.body[0] + Vector2(0, 1)
-                    if next_pos not in snakeopp.body and next_pos not in snake.body and next_pos.y < cell_number:
+                    if next_pos not in snakeopp.body and next_pos not in snake1.body and next_pos.y < cell_number:
                         snakeopp.direction = Vector2(0, 1)
                         snakeopp.blocked = False
                 elif event.key == pygame.K_a and snakeopp.direction != Vector2(1, 0):
                     # Check if the forward-facing position is clear before changing direction
                     next_pos = snakeopp.body[0] + Vector2(-1, 0)
-                    if next_pos not in snakeopp.body and next_pos not in snake.body and next_pos.x >= 0:
+                    if next_pos not in snakeopp.body and next_pos not in snake1.body and next_pos.x >= 0:
                         snakeopp.direction = Vector2(-1, 0)
                         snakeopp.blocked = False
                 elif event.key == pygame.K_d and snakeopp.direction != Vector2(-1, 0):
                     # Check if the forward-facing position is clear before changing direction
                     next_pos = snakeopp.body[0] + Vector2(1, 0)
-                    if next_pos not in snakeopp.body and next_pos not in snake.body and next_pos.x < cell_number:
+                    if next_pos not in snakeopp.body and next_pos not in snake1.body and next_pos.x < cell_number:
                         snakeopp.direction = Vector2(1, 0)
                         snakeopp.blocked = False
 
         # Drawing all elements
         screen.fill((175, 215, 70))
-        snake.draw_snake()
+        snake1.draw_snake()
         snakeopp.draw_snake()
         pygame.display.update()
         clock.tick(60)
@@ -421,14 +424,13 @@ def main_menu():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_1:
                         solo()
-                        return True
                     if event.key == pygame.K_2:
                         OneOnOne()
-                        return True
                     if event.key == pygame.K_3:
                         decayMode()
                     if event.key == pygame.K_4:
-                        pygame.Quit()
+                        pygame.quit()
+                        sys.exit()
 
 main_menu()
            
